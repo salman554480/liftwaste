@@ -205,3 +205,11 @@ body {
 .search-form-custom {
   max-width: 250px;
 } 
+
+/* Spacing between accordion cards */
+.accordion-item {
+  margin-bottom: 1.25rem;
+}
+.accordion-item:last-child {
+  margin-bottom: 0;
+} 
