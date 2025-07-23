@@ -196,6 +196,14 @@ body {
 .notification-footer {
   background: #f8f9fa;
 }
+
+.custom-card{
+  background: #fff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 1.5rem;
+}
+
 @media (max-width: 767.98px) {
   .notification-dropdown {
     min-width: 200px;
