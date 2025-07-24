@@ -1,85 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard 2</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Nunito Sans font -->
-  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<?php require_once('parts/top.php'); ?>
 </head>
 <body>
   <div class="d-flex" id="wrapper">
     <!-- Sidebar (unchanged) -->
-    <div class="bg-white border-end sidebar" id="sidebar-wrapper">
-      <div class="d-flex align-items-center justify-content-between sidebar-heading text-primary fw-bold py-4 px-3">
-        Lift/CB&E
-        <button class="btn btn-link d-lg-none p-0 ms-2" id="sidebar-close" aria-label="Close sidebar"><i class="fas fa-times fa-lg"></i></button>
-      </div>
-      <div class="list-group list-group-flush">
-        <a href="index.html" class="list-group-item list-group-item-action active"><i
-            class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
-        <a href="all_orders.html" class="list-group-item list-group-item-action"><i class="fas fa-list me-2"></i>All Orders</a>
-        <a href="member.html" class="list-group-item list-group-item-action"><i class="fas fa-user me-2"></i>Members</a>
-      </div>
-      <div class="sidebar-footer mt-auto px-3 pb-3">
-        <a href="#" class="list-group-item list-group-item-action"><i class="fas fa-cog me-2"></i>Settings</a>
-        <a href="#" class="list-group-item list-group-item-action text-danger"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
-      </div>
-    </div>
+    
+    <?php require_once('parts/sidebar.php'); ?>
     <!-- /#sidebar-wrapper -->
-
+    
     <!-- Page Content -->
     <div id="page-content-wrapper" class="flex-grow-1">
       <!-- Topbar -->
-      <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-3 flex-column flex-md-row">
-        <div class="d-flex w-100 align-items-center justify-content-between">
-          <button class="btn btn-outline-primary d-lg-none me-2" id="menu-toggle"><i class="fas fa-bars"></i></button>
-          <form class="d-none d-md-flex flex-grow-1 me-2 search-form-custom">
-            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-          </form>
-          <ul class="navbar-nav ms-auto align-items-center flex-row">
-            <li class="nav-item me-3 position-relative" id="notification-nav-item">
-              <a class="nav-link position-relative" href="#" id="notification-bell"><i class="fas fa-bell"></i><span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">1</span></a>
-              <div class="notification-dropdown shadow" id="notification-dropdown" style="display: none;">
-                <div class="notification-header fw-bold px-3 py-2 border-bottom">Notifications</div>
-                <div class="notification-list">
-                  <div class="notification-item px-3 py-2 border-bottom">
-                    <div class="small text-muted">2 mins ago</div>
-                    <div>New request received from <b>John</b></div>
-                  </div>
-                  <div class="notification-item px-3 py-2 border-bottom">
-                    <div class="small text-muted">10 mins ago</div>
-                    <div>Task <b>Assigned</b> to you</div>
-                  </div>
-                  <div class="notification-item px-3 py-2">
-                    <div class="small text-muted">1 hour ago</div>
-                    <div>Request <b>Completed</b> by Mike</div>
-                  </div>
-                </div>
-                <div class="notification-footer text-center py-2">
-                  <a href="#" class="small">View all</a>
-                </div>
-              </div>
-            </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link p-0" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <!-- Changed profile image -->
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Profile" class="rounded-circle" width="40" height="40">
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><a class="dropdown-item" href="#">Settings</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="#">Logout</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </nav>
+      
+      <?php require_once('parts/navbar.php'); ?>
       <!-- /Topbar -->
 
       <div class="container-fluid py-4">
@@ -293,30 +225,9 @@
     </div>
     <!-- /#page-content-wrapper -->
   </div>
-  <!-- Bootstrap 5 JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Sidebar toggle for mobile
-    document.getElementById('menu-toggle')?.addEventListener('click', function() {
-      document.getElementById('wrapper').classList.toggle('toggled');
-    });
-    // Sidebar close button for mobile
-    document.getElementById('sidebar-close')?.addEventListener('click', function() {
-      document.getElementById('wrapper').classList.remove('toggled');
-    });
+ 
 
-    // Notification dropdown toggle
-    const bell = document.getElementById('notification-bell');
-    const dropdown = document.getElementById('notification-dropdown');
-    document.addEventListener('click', function(event) {
-      if (bell && dropdown) {
-        if (bell.contains(event.target)) {
-          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        } else if (!dropdown.contains(event.target)) {
-          dropdown.style.display = 'none';
-        }
-      }
-    });
-  </script>
-</body>
+  <?php require_once('parts/footer.php'); ?>
+
+  </body>
 </html> 
