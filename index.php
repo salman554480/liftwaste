@@ -95,36 +95,7 @@
               </button>
             </h2>
             <div id="collapseNew" class="accordion-collapse collapse" aria-labelledby="headingNew" data-bs-parent="#dashboardAccordion">
-              <div class="accordion-body">
-                <div class="card mail-card mb-0">
-                  <div class="card-body">
-                    <div class="table-responsive">
-                      <table class="table align-middle">
-                        <thead class="table-light">
-                          <tr>
-                            <th>Username</th>
-                            <th>Location</th>
-                            <th>Date - Time</th>
-                            <th>Mails/Phone</th>
-                            <th>Assigned to</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td><span class="avatar bg-secondary text-white rounded-circle me-2">M</span> Mike</td>
-                            <td>6096 Marjolaine Landing</td>
-                            <td>12.09.2019 - 12.53 PM</td>
-                            <td>Abc@mail.com</td>
-                            <td>Abc@mail.com</td>
-                            <td><span class="badge bg-danger">New</span></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <?php require_once('parts/index/pending_email.php'); ?>
             </div>
           </div>
           <!-- Assigned Card -->
@@ -141,36 +112,7 @@
               </button>
             </h2>
             <div id="collapseAssigned" class="accordion-collapse collapse" aria-labelledby="headingAssigned" data-bs-parent="#dashboardAccordion">
-              <div class="accordion-body">
-                <div class="card mail-card mb-0">
-                  <div class="card-body">
-                    <div class="table-responsive">
-                      <table class="table align-middle">
-                        <thead class="table-light">
-                          <tr>
-                            <th>Username</th>
-                            <th>Location</th>
-                            <th>Date - Time</th>
-                            <th>Mails/Phone</th>
-                            <th>Assigned to</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td><span class="avatar bg-secondary text-white rounded-circle me-2">D</span> Doe</td>
-                            <td>6096 Marjolaine Landing</td>
-                            <td>12.09.2019 - 12.53 PM</td>
-                            <td>Abc@mail.com</td>
-                            <td>Abc@mail.com</td>
-                            <td><span class="badge bg-warning text-dark">Assigned</span></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                 <?php require_once('parts/index/assigned.php'); ?>
             </div>
           </div>
           <!-- Disposed Off Card -->
@@ -187,36 +129,7 @@
               </button>
             </h2>
             <div id="collapseDisposed" class="accordion-collapse collapse" aria-labelledby="headingDisposed" data-bs-parent="#dashboardAccordion">
-              <div class="accordion-body">
-                <div class="card mail-card mb-0">
-                  <div class="card-body">
-                    <div class="table-responsive">
-                      <table class="table align-middle">
-                        <thead class="table-light">
-                          <tr>
-                            <th>Username</th>
-                            <th>Location</th>
-                            <th>Date - Time</th>
-                            <th>Mails/Phone</th>
-                            <th>Assigned to</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td><span class="avatar bg-secondary text-white rounded-circle me-2">J</span> John</td>
-                            <td>6096 Marjolaine Landing</td>
-                            <td>12.09.2019 - 12.53 PM</td>
-                            <td>Abc@mail.com</td>
-                            <td>Abc@mail.com</td>
-                            <td><span class="badge bg-success">Completed</span></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
+             <?php require_once('parts/index/completed.php'); ?>
             </div>
           </div>
         </div>
