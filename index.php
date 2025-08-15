@@ -15,73 +15,10 @@
       <!-- /Topbar -->
 
       <div class="container-fluid py-4">
-        <h2 class="fw-bold mb-4">Dashboard 2</h2>
+        <h2 class="fw-bold mb-4">Dashboard </h2>
         <!-- Accordion for Cards and Table -->
         <div class="accordion" id="dashboardAccordion">
-          <!-- All Requests Card 
-          <div class="accordion-item">
-            <h2 class="accordion-header" id="headingAll">
-              <button class="accordion-button bg-white-card text-black" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAll" aria-expanded="true" aria-controls="collapseAll">
-                <div class="d-flex align-items-center w-100">
-                  <div class="me-3"><i class="fas fa-envelope fa-2x text-danger"></i></div>
-                  <div>
-                    <h6 class="mb-1">All Requests</h6>
-                    <small class="text-muted">You can see all requests here</small>
-                  </div>
-                </div>
-              </button>
-            </h2>
-            <div id="collapseAll" class="accordion-collapse collapse show" aria-labelledby="headingAll" data-bs-parent="#dashboardAccordion">
-              <div class="accordion-body">
-                
-                <div class="card mail-card mb-0">
-                  <div class="card-body">
-                    <div class="table-responsive">
-                      <table class="table align-middle">
-                        <thead class="table-light">
-                          <tr>
-                            <th>Username</th>
-                            <th>Location</th>
-                            <th>Date - Time</th>
-                            <th>Mails/Phone</th>
-                            <th>Assigned to</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td><span class="avatar bg-secondary text-white rounded-circle me-2">J</span> John</td>
-                            <td>6096 Marjolaine Landing</td>
-                            <td>12.09.2019 - 12.53 PM</td>
-                            <td>Abc@mail.com</td>
-                            <td>Abc@mail.com</td>
-                            <td><span class="badge bg-success">Completed</span></td>
-                          </tr>
-                          <tr>
-                            <td><span class="avatar bg-secondary text-white rounded-circle me-2">D</span> Doe</td>
-                            <td>6096 Marjolaine Landing</td>
-                            <td>12.09.2019 - 12.53 PM</td>
-                            <td>Abc@mail.com</td>
-                            <td>Abc@mail.com</td>
-                            <td><span class="badge bg-warning text-dark">Assigned</span></td>
-                          </tr>
-                          <tr>
-                            <td><span class="avatar bg-secondary text-white rounded-circle me-2">M</span> Mike</td>
-                            <td>6096 Marjolaine Landing</td>
-                            <td>12.09.2019 - 12.53 PM</td>
-                            <td>Abc@mail.com</td>
-                            <td>Abc@mail.com</td>
-                            <td><span class="badge bg-danger">New</span></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> -->
-          <!-- New Requests Card -->
+          
           <div class="accordion-item">
             <h2 class="accordion-header" id="headingNew">
               <button class="accordion-button collapsed bg-red-card text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNew" aria-expanded="false" aria-controls="collapseNew">

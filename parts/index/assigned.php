@@ -5,67 +5,65 @@
                 <table class="table align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>Assign To</th>
-                            <th>Sender</th>
+                            <th>Username</th>
+                            <th>Location</th>
                             <th>Date - Time</th>
-                            <th>Recepient</th>
+                            <th>Mails/Phone</th>
                             <th>Status</th>
+                            <th>Assign To</th>
+                            <?php if($admin_role == 'employee') { ?>
                             <th>Action</th>
+                            <?php } ?>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                        $select_assigned = "SELECT * FROM assign WHERE assign_status = 'assigned' ORDER BY assign_id DESC LIMIT 5";
-                        $result_assigned = mysqli_query($conn, $select_assigned);
-                        if (mysqli_num_rows($result_assigned) > 0) {
-                            while ($row_assigned = mysqli_fetch_assoc($result_assigned)) {
-                                $assign_id = $row_assigned['assign_id'];
-                                $email_id = $row_assigned['email_id'];
-                                $admin_id = $row_assigned['admin_id'];
-                                $assign_status = $row_assigned['assign_status'];
-                                $created_at = $row_assigned['created_at'];
-                                $updated_at = $row_assigned['updated_at'];
+                        if ($admin_role == 'admin') {
+                            $select_pending = "SELECT * FROM email WHERE status = 'assigned'  ORDER BY id DESC LIMIT 5";
+                        } else {
+                            $select_pending = "SELECT * FROM email WHERE status = 'assigned' AND admin_id = '$admin_id' ORDER BY id DESC LIMIT 5";
+                        }
+                        $result_pending = mysqli_query($conn, $select_pending);
+                        if (mysqli_num_rows($result_pending) > 0) {
+                            while ($row_pending = mysqli_fetch_assoc($result_pending)) {
+                                $id = $row_pending['id'];
+                                $assign_to = $row_pending['admin_id'];
+                                $sender = $row_pending['sender'];
+                                $subject = $row_pending['subject'];
+                                $body_html = $row_pending['body_html'];
+                                $recipient = $row_pending['recipient'];
+                                $received_at = $row_pending['received_at'];
 
-                                // $first_letter = $sender[0];
+                                $first_letter = $sender[0];
 
-                                $date = new DateTime($created_at);
+                                $date = new DateTime($received_at);
                                 $formatted_date = $date->format('d.m.Y - h.i A');
 
-
-                                $select_name = "SELECT * FROM admins WHERE admin_id = $admin_id";
-                                $result_name = mysqli_query($conn, $select_name);
-                                $admin_row = mysqli_fetch_assoc($result_name);
-                                $assign_to = $admin_row['admin_name'];
-
-                                $select_email = "SELECT * FROM email WHERE id = $email_id";
-                                $result_email = mysqli_query($conn, $select_email);
-                                $email_row = mysqli_fetch_assoc($result_email);
-                                $sender = $email_row['sender'];
-                                $recipient = $email_row['recipient'];
-                                $subject = $email_row['subject'];
-                                $body_html = $email_row['body_html'];
+                                $select_assign_to = "SELECT * FROM admins WHERE admin_id = '$assign_to'";
+                                $result_assign_to = mysqli_query($conn, $select_assign_to);
+                                $row_assign_to = mysqli_fetch_assoc($result_assign_to);
+                                $assign_to_name = $row_assign_to['admin_name'];
 
                         ?>
                                 <tr>
-                                    <td><?php echo $assign_to; ?></td>
-                                    <td> <?php echo $sender; ?></td>
+                                    <td><span class="avatar bg-secondary text-white rounded-circle me-2"><?php echo $first_letter; ?></span> <?php echo $sender; ?></td>
+                                    <td>6096 Marjolaine Landing</td>
                                     <td><?php echo $formatted_date; ?></td>
                                     <td><?php echo $recipient; ?></td>
-                                    <td><span class="badge bg-yellow-card text-dark">Assigned</span></td>
+                                    <td><span class="badge bg-warning">Assigned</span></td>
+                                    <td><?php echo $assign_to_name; ?></td>
+                                    <?php if($admin_role == 'employee') { ?>
                                     <td>
-                                        <button
-                                            class="btn btn-success btn-sm update-btn"
-                                            data-id="<?php echo $assign_id; ?>"
-                                            data-status="completed">
-                                            Complete
+                                        <button class="btn btn-success btn-sm complete-btn" data-id="<?php echo $id; ?>">
+                                            <i class="fa fa-check"></i> Mark as Completed
                                         </button>
-
                                     </td>
+                                    <?php } ?>
                                 </tr>
                         <?php
                             }
                         } else {
-                            echo "<tr><td colspan='6' class='text-center'>No assigned requests</td></tr>";
+                            echo "<tr><td colspan='6' class='text-center'>No pending requests</td></tr>";
                         }
                         ?>
                     </tbody>
@@ -77,10 +75,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.update-btn').forEach(function(btn) {
+        document.querySelectorAll('.complete-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
-                const assignId = this.getAttribute('data-id');
-                const newStatus = this.getAttribute('data-status');
+                const emailId = this.getAttribute('data-id');
+                const newStatus = 'completed';
 
                 Swal.fire({
                     title: 'Updating status...',
@@ -90,12 +88,12 @@
                     }
                 });
 
-                fetch('query/update_assign_status.php', {
+                fetch('query/update_status.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                         },
-                        body: 'assign_id=' + assignId + '&status=' + newStatus
+                        body: 'email_id=' + emailId + '&status=' + newStatus
                     })
                     .then(response => response.json())
                     .then(data => {
