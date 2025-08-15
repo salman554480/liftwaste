@@ -2,7 +2,7 @@
 require_once('parts/top.php'); 
 $page = "profile";
 
-// Check if user is admin
+// Check if user is admingit 
 if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
     header('Location: index.php');
     exit();
