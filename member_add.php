@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <select class="form-select" id="role" name="admin_role" required>
                   <option selected disabled>Choose role</option>
                   <option value="admin">Admin</option>
-                  <option value="staff">Staff</option>
+                  <option value="employee">Employee</option>
                 </select>
               </div>
 

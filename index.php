@@ -1,4 +1,6 @@
-<?php require_once('parts/top.php'); ?>
+<?php require_once('parts/top.php');
+$page= "index";
+?>
 </head>
 <body>
   <div class="d-flex" id="wrapper">

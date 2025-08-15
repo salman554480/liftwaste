@@ -17,7 +17,10 @@
 
 
             <div class="container-fluid py-4">
-                <h2 class="fw-bold mb-4">Members</h2>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="fw-bold mb-4">Members</h2>
+                    <a href="member_add.php" class="btn btn-primary">Add Member</a>
+                </div>
                 <?php
                 $result = mysqli_query($conn, "SELECT * FROM admins ORDER BY admin_id DESC");
                 ?>
@@ -121,7 +124,7 @@
                                                     <label>Role</label>
                                                     <select name="admin_role" id="edit_role" class="form-select" required>
                                                         <option value="admin">Admin</option>
-                                                        <option value="staff">Staff</option>
+                                                        <option value="employee">Employee</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-md-6">

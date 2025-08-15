@@ -1,4 +1,6 @@
-<?php require_once('parts/top.php'); ?>
+<?php require_once('parts/top.php'); 
+$page= "order_view";
+?>
 </head>
 
 <body>

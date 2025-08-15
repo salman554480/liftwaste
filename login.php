@@ -74,9 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </form>
 
-                    <div class="mt-3 text-center">
+                    <!-- <div class="mt-3 text-center">
                         <a href="#">Forgot password?</a>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
