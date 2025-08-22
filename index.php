@@ -33,7 +33,7 @@ $page= "index";
                 </div>
               </button>
             </h2>
-            <div id="collapseNew" class="accordion-collapse collapse" aria-labelledby="headingNew" data-bs-parent="#dashboardAccordion">
+            <div id="collapseNew" class="accordion-collapse collapse show" aria-labelledby="headingNew" data-bs-parent="#dashboardAccordion">
               <?php require_once('parts/index/pending_email.php'); ?>
             </div>
           </div>

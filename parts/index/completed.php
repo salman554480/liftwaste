@@ -6,11 +6,12 @@
                     <thead class="table-light">
                         <tr>
                             <th>Username</th>
-                            <th>Location</th>
+                            <th>Message</th>
                             <th>Date - Time</th>
                             <th>Mails/Phone</th>
                             <th>Status</th>
                             <th>Assign To</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,17 +45,21 @@
                         ?>
                                 <tr>
                                     <td><span class="avatar bg-secondary text-white rounded-circle me-2"><?php echo $first_letter; ?></span> <?php echo $sender; ?></td>
-                                    <td>6096 Marjolaine Landing</td>
+                                    <td><?php echo $subject; ?></td>
                                     <td><?php echo $formatted_date; ?></td>
                                     <td><?php echo $recipient; ?></td>
                                     <td><span class="badge bg-success"><i class="fa fa-check-double"></i> Completed</span></td>
                                     <td><?php echo $assign_to_name; ?></td>
-                                    
+                                    <td>
+                                        <a href="email_details.php?id=<?php echo $id; ?>" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
                                 </tr>
                         <?php
                             }
                         } else {
-                            echo "<tr><td colspan='6' class='text-center'>No pending requests</td></tr>";
+                            echo "<tr><td colspan='7' class='text-center'>No completed requests</td></tr>";
                         }
                         ?>
                     </tbody>

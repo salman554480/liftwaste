@@ -1,18 +1,31 @@
+<?php
+if ($admin_role == 'employee') {
+  $count_user_pending_task = "SELECT COUNT(*) FROM email WHERE status = 'assigned' AND admin_id = '$admin_id'";
+  $result_count_user_pending_task = mysqli_query($conn, $count_user_pending_task);
+  $row_count_user_pending_task = mysqli_fetch_assoc($result_count_user_pending_task);
+  $count_user_pending_task = $row_count_user_pending_task['COUNT(*)'];
+}
+?>
 <div class="accordion-body">
   <div class="card mail-card mb-0">
     <div class="card-body">
+      <?php if ($admin_role == 'employee') { ?>
+        <?php if ($count_user_pending_task > 0) { ?>
+          <div class="alert alert-info">
+            <small>You cannot assign a new task while another task is already in progress.</small>
+          </div>
+        <?php } ?>
+      <?php } ?>
       <div class="table-responsive">
         <table class="table align-middle">
           <thead class="table-light">
             <tr>
               <th>Username</th>
-              <th>Location</th>
+              <th>Message</th>
               <th>Date - Time</th>
               <th>Mails/Phone</th>
               <th>Status</th>
-              <?php if($admin_role == 'employee') { ?>
-              <th>Action</th>
-              <?php } ?>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -33,20 +46,26 @@
                 $date = new DateTime($received_at);
                 $formatted_date = $date->format('d.m.Y - h.i A');
 
+
             ?>
                 <tr>
                   <td><span class="avatar bg-secondary text-white rounded-circle me-2"><?php echo $first_letter; ?></span> <?php echo $sender; ?></td>
-                  <td><?php echo $subject?></td>
+                  <td><?php echo $subject ?></td>
                   <td><?php echo $formatted_date; ?></td>
                   <td><?php echo $recipient; ?></td>
                   <td><span class="badge bg-danger">New</span></td>
-                  <?php if($admin_role == 'employee') { ?>
                   <td>
-                    <button class="btn btn-success btn-sm assign-btn" data-id="<?php echo $id; ?>">
-                      Assign
-                    </button>
+                    <div class="btn-group" role="group">
+                      <a href="email_details.php?id=<?php echo $id; ?>" class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye"></i> View
+                      </a>
+                      <?php if ($admin_role == 'employee' && $count_user_pending_task < 1) { ?>
+                        <button class="btn btn-success btn-sm assign-btn" data-id="<?php echo $id; ?>">
+                          <i class="fas fa-user-check"></i> Assign
+                        </button>
+                      <?php } ?>
+                    </div>
                   </td>
-                  <?php } ?>
                 </tr>
             <?php
               }
@@ -62,59 +81,59 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.assign-btn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                const emailId = this.getAttribute('data-id');
-                const newStatus = 'assigned';
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.assign-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const emailId = this.getAttribute('data-id');
+        const newStatus = 'assigned';
 
-                console.log(emailId);
-                console.log(newStatus);
+        console.log(emailId);
+        console.log(newStatus);
 
-                Swal.fire({
-                    title: 'Assigning...',
-                    title: 'Please Wait...',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
-                fetch('query/update_status.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'email_id=' + emailId + '&status=' + newStatus
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: data.message,
-                                timer: 1500,
-                                showConfirmButton: false
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: data.message
-                            });
-                        }
-                    })
-                    .catch(() => {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Request Failed',
-                            text: 'Please try again.'
-                        });
-                    });
-            });
+        Swal.fire({
+          title: 'Assigning...',
+          title: 'Please Wait...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
         });
+
+        fetch('query/update_status.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'email_id=' + emailId + '&status=' + newStatus
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: data.message,
+                timer: 1500,
+                showConfirmButton: false
+              }).then(() => {
+                location.reload();
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message
+              });
+            }
+          })
+          .catch(() => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Request Failed',
+              text: 'Please try again.'
+            });
+          });
+      });
     });
+  });
 </script>

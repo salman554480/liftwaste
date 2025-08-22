@@ -6,14 +6,12 @@
                     <thead class="table-light">
                         <tr>
                             <th>Username</th>
-                            <th>Location</th>
+                            <th>Message</th>
                             <th>Date - Time</th>
                             <th>Mails/Phone</th>
                             <th>Status</th>
                             <th>Assign To</th>
-                            <?php if($admin_role == 'employee') { ?>
-                            <th>Action</th>
-                            <?php } ?>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -47,23 +45,28 @@
                         ?>
                                 <tr>
                                     <td><span class="avatar bg-secondary text-white rounded-circle me-2"><?php echo $first_letter; ?></span> <?php echo $sender; ?></td>
-                                    <td>6096 Marjolaine Landing</td>
+                                    <td><?php echo $subject; ?></td>
                                     <td><?php echo $formatted_date; ?></td>
                                     <td><?php echo $recipient; ?></td>
                                     <td><span class="badge bg-warning">Assigned</span></td>
                                     <td><?php echo $assign_to_name; ?></td>
-                                    <?php if($admin_role == 'employee') { ?>
                                     <td>
-                                        <button class="btn btn-success btn-sm complete-btn" data-id="<?php echo $id; ?>">
-                                            <i class="fa fa-check"></i> Mark as Completed
-                                        </button>
+                                        <div class="btn-group" role="group">
+                                            <a href="email_details.php?id=<?php echo $id; ?>" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                            <?php if($admin_role == 'employee') { ?>
+                                            <button class="btn btn-success btn-sm complete-btn" data-id="<?php echo $id; ?>">
+                                                <i class="fa fa-check"></i> Mark as Completed
+                                            </button>
+                                            <?php } ?>
+                                        </div>
                                     </td>
-                                    <?php } ?>
                                 </tr>
                         <?php
                             }
                         } else {
-                            echo "<tr><td colspan='6' class='text-center'>No pending requests</td></tr>";
+                            echo "<tr><td colspan='7' class='text-center'>No assigned requests</td></tr>";
                         }
                         ?>
                     </tbody>
