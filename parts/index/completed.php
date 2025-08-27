@@ -16,11 +16,8 @@
                     </thead>
                     <tbody>
                         <?php
-                        if ($admin_role == 'admin') {
-                            $select_pending = "SELECT * FROM email WHERE status = 'completed'  ORDER BY id DESC LIMIT 5";
-                        } else {
-                            $select_pending = "SELECT * FROM email WHERE status = 'completed' AND admin_id = '$admin_id' ORDER BY id DESC LIMIT 5";
-                        }
+                        // Show all completed emails for everyone
+                        $select_pending = "SELECT * FROM email WHERE status = 'completed' ORDER BY id DESC LIMIT 5";
                         $result_pending = mysqli_query($conn, $select_pending);
                         if (mysqli_num_rows($result_pending) > 0) {
                             while ($row_pending = mysqli_fetch_assoc($result_pending)) {

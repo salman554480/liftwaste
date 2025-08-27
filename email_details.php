@@ -208,7 +208,30 @@ if (!$email) {
                             </div>
                         </div>
 
-                       
+                        <!-- Actions Card -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-tools me-2"></i>
+                                    Actions
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <?php if ($email['status'] === 'pending'): ?>
+                                    <button class="btn btn-primary w-100 mb-2" onclick="authenticateAndAssign(<?php echo $email_id; ?>)">
+                                        <i class="fas fa-user-check me-2"></i>Assign to Me
+                                    </button>
+                                <?php elseif ($email['status'] === 'assigned'): ?>
+                                    <button class="btn btn-success w-100 mb-2" onclick="authenticateAndComplete(<?php echo $email_id; ?>)">
+                                        <i class="fas fa-check me-2"></i>Mark as Completed
+                                    </button>
+                                <?php endif; ?>
+                                
+                                <a href="mailto:<?php echo htmlspecialchars($email['sender_email']); ?>" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-reply me-2"></i>Reply to Sender
+                                </a>
+                            </div>
+                        </div>
 
                         <!-- Activity Log Card -->
                         <div class="card">
@@ -329,6 +352,137 @@ if (!$email) {
     </style>
 
     <script>
+        function authenticateAndAssign(emailId) {
+            Swal.fire({
+                title: 'Authentication Required',
+                html: `
+                    <div class="mb-3">
+                        <label for="auth_email" class="form-label">Email Address</label>
+                        <input type="email" id="auth_email" class="form-control" placeholder="Enter your email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="auth_password" class="form-label">Password</label>
+                        <input type="password" id="auth_password" class="form-control" placeholder="Enter your password">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Authenticate & Assign',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    const email = document.getElementById('auth_email').value;
+                    const password = document.getElementById('auth_password').value;
+                    
+                    if (!email || !password) {
+                        Swal.showValidationMessage('Please enter both email and password');
+                        return false;
+                    }
+                    
+                    return { email, password };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    authenticateAndUpdateStatus(emailId, 'assigned', result.value.email, result.value.password);
+                }
+            });
+        }
+
+        function authenticateAndComplete(emailId) {
+            Swal.fire({
+                title: 'Authentication Required',
+                html: `
+                    <div class="mb-3">
+                        <label for="auth_email" class="form-label">Email Address</label>
+                        <input type="email" id="auth_email" class="form-control" placeholder="Enter your email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="auth_password" class="form-label">Password</label>
+                        <input type="password" id="auth_password" class="form-control" placeholder="Enter your password">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Authenticate & Complete',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    const email = document.getElementById('auth_email').value;
+                    const password = document.getElementById('auth_password').value;
+                    
+                    if (!email || !password) {
+                        Swal.showValidationMessage('Please enter both email and password');
+                        return false;
+                    }
+                    
+                    return { email, password };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    authenticateAndUpdateStatus(emailId, 'completed', result.value.email, result.value.password);
+                }
+            });
+        }
+
+        function authenticateAndUpdateStatus(emailId, newStatus, email, password) {
+            const statusText = newStatus === 'assigned' ? 'Assigning...' : 'Updating...';
+            
+            Swal.fire({
+                title: 'Authenticating...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // First authenticate the user
+            fetch('query/authenticate_user.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Authentication successful, now update status
+                    return fetch('query/update_status.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'email_id=' + emailId + '&status=' + newStatus + '&admin_email=' + encodeURIComponent(email)
+                    });
+                } else {
+                    throw new Error(data.message || 'Authentication failed');
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message
+                    });
+                }
+            })
+            .catch((error) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Authentication Failed',
+                    text: error.message || 'Please check your credentials and try again.'
+                });
+            });
+        }
+
         function updateStatus(emailId, newStatus) {
             const statusText = newStatus === 'assigned' ? 'Assigning...' : 'Updating...';
             

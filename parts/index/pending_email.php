@@ -1,21 +1,10 @@
 <?php
-if ($admin_role == 'employee') {
-  $count_user_pending_task = "SELECT COUNT(*) FROM email WHERE status = 'assigned' AND admin_id = '$admin_id'";
-  $result_count_user_pending_task = mysqli_query($conn, $count_user_pending_task);
-  $row_count_user_pending_task = mysqli_fetch_assoc($result_count_user_pending_task);
-  $count_user_pending_task = $row_count_user_pending_task['COUNT(*)'];
-}
+// No role restrictions - anyone can access all functionality
+$count_user_pending_task = 0; // Set to 0 to allow unlimited assignments
 ?>
 <div class="accordion-body">
   <div class="card mail-card mb-0">
     <div class="card-body">
-      <?php if ($admin_role == 'employee') { ?>
-        <?php if ($count_user_pending_task > 0) { ?>
-          <div class="alert alert-info">
-            <small>You cannot assign a new task while another task is already in progress.</small>
-          </div>
-        <?php } ?>
-      <?php } ?>
       <div class="table-responsive">
         <table class="table align-middle">
           <thead class="table-light">
@@ -59,11 +48,9 @@ if ($admin_role == 'employee') {
                       <a href="email_details.php?id=<?php echo $id; ?>" class="btn btn-primary btn-sm">
                         <i class="fas fa-eye"></i> View
                       </a>
-                      <?php if ($admin_role == 'employee' && $count_user_pending_task < 1) { ?>
-                        <button class="btn btn-success btn-sm assign-btn" data-id="<?php echo $id; ?>">
-                          <i class="fas fa-user-check"></i> Assign
-                        </button>
-                      <?php } ?>
+                      <button class="btn btn-success btn-sm assign-btn" data-id="<?php echo $id; ?>">
+                        <i class="fas fa-user-check"></i> Assign
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -85,55 +72,101 @@ if ($admin_role == 'employee') {
     document.querySelectorAll('.assign-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         const emailId = this.getAttribute('data-id');
-        const newStatus = 'assigned';
-
-        console.log(emailId);
-        console.log(newStatus);
-
+        
+        // Show authentication popup
         Swal.fire({
-          title: 'Assigning...',
-          title: 'Please Wait...',
-          allowOutsideClick: false,
-          didOpen: () => {
-            Swal.showLoading();
+          title: 'Authentication Required',
+          html: `
+            <div class="mb-3">
+              <label for="auth_email" class="form-label">Email Address</label>
+              <input type="email" id="auth_email" class="form-control" placeholder="Enter your email">
+            </div>
+            <div class="mb-3">
+              <label for="auth_password" class="form-label">Password</label>
+              <input type="password" id="auth_password" class="form-control" placeholder="Enter your password">
+            </div>
+          `,
+          showCancelButton: true,
+          confirmButtonText: 'Authenticate & Assign',
+          cancelButtonText: 'Cancel',
+          preConfirm: () => {
+            const email = document.getElementById('auth_email').value;
+            const password = document.getElementById('auth_password').value;
+            
+            if (!email || !password) {
+              Swal.showValidationMessage('Please enter both email and password');
+              return false;
+            }
+            
+            return { email, password };
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            authenticateAndAssign(emailId, result.value.email, result.value.password);
           }
         });
-
-        fetch('query/update_status.php', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'email_id=' + emailId + '&status=' + newStatus
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: data.message,
-                timer: 1500,
-                showConfirmButton: false
-              }).then(() => {
-                location.reload();
-              });
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.message
-              });
-            }
-          })
-          .catch(() => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Request Failed',
-              text: 'Please try again.'
-            });
-          });
       });
     });
   });
+
+  function authenticateAndAssign(emailId, email, password) {
+    Swal.fire({
+      title: 'Authenticating...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    // First authenticate the user
+    fetch('query/authenticate_user.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: 'email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Authentication successful, now assign the email
+        return fetch('query/update_status.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'email_id=' + emailId + '&status=assigned&admin_email=' + encodeURIComponent(email)
+        });
+      } else {
+        throw new Error(data.message || 'Authentication failed');
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: data.message,
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => {
+          location.reload();
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: data.message
+        });
+      }
+    })
+    .catch((error) => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Authentication Failed',
+        text: error.message || 'Please check your credentials and try again.'
+      });
+    });
+  }
 </script>

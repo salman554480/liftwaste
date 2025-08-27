@@ -16,11 +16,8 @@
                     </thead>
                     <tbody>
                         <?php
-                        if ($admin_role == 'admin') {
-                            $select_pending = "SELECT * FROM email WHERE status = 'assigned'  ORDER BY id DESC LIMIT 5";
-                        } else {
-                            $select_pending = "SELECT * FROM email WHERE status = 'assigned' AND admin_id = '$admin_id' ORDER BY id DESC LIMIT 5";
-                        }
+                        // Show all assigned emails for everyone
+                        $select_pending = "SELECT * FROM email WHERE status = 'assigned' ORDER BY id DESC LIMIT 5";
                         $result_pending = mysqli_query($conn, $select_pending);
                         if (mysqli_num_rows($result_pending) > 0) {
                             while ($row_pending = mysqli_fetch_assoc($result_pending)) {
@@ -55,11 +52,9 @@
                                             <a href="email_details.php?id=<?php echo $id; ?>" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-eye"></i> View
                                             </a>
-                                            <?php if($admin_role == 'employee') { ?>
                                             <button class="btn btn-success btn-sm complete-btn" data-id="<?php echo $id; ?>">
                                                 <i class="fa fa-check"></i> Mark as Completed
                                             </button>
-                                            <?php } ?>
                                         </div>
                                     </td>
                                 </tr>
