@@ -10,9 +10,9 @@
         <a href="#" class="list-group-item list-group-item-action <?php if($page == 'order_view') { echo 'active'; } ?>" onclick="authenticateAdmin('order_view.php')"><i class="fas fa-list me-2"></i>All Orders</a>
         <a href="#" class="list-group-item list-group-item-action" onclick="authenticateAdmin('member_view.php')"><i class="fas fa-user me-2"></i>Members</a>
       </div>
-      <div class="sidebar-footer mt-auto px-3 pb-3">
+      <!--<div class="sidebar-footer mt-auto px-3 pb-3">
         <a href="#" class="list-group-item list-group-item-action"><i class="fas fa-cog me-2"></i>Settings</a>
-      </div>
+      </div>-->
     </div>
 
 <script>

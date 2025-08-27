@@ -100,9 +100,9 @@ $page= "order_view";
             let html = '';
             emails.forEach(email => {
                 const statusClass = getStatusClass(email.status);
-                const receivedDate = new Date(email.received_at).toLocaleDateString();
-                const assignedDate = email.assigned_at ? new Date(email.assigned_at).toLocaleDateString() : 'Not assigned';
-                const completedDate = email.completed_at ? new Date(email.completed_at).toLocaleDateString() : 'Not completed';
+                const receivedDate = formatDateTime(email.received_at);
+                const assignedDate = email.assigned_at ? formatDateTime(email.assigned_at) : 'Not assigned';
+                const completedDate = email.completed_at ? formatDateTime(email.completed_at) : 'Not completed';
                 
                 html += `
                     <div class="card mb-3">
@@ -184,11 +184,25 @@ $page= "order_view";
 
         function getStatusClass(status) {
             switch(status) {
-                case 'pending': return 'bg-warning';
-                case 'assigned': return 'bg-info';
+                case 'pending': return 'bg-danger';
+                case 'assigned': return 'bg-warning';
                 case 'completed': return 'bg-success';
                 default: return 'bg-secondary';
             }
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return 'Not set';
+            const date = new Date(dateString);
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = date.getHours();
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            
+            return `${month}/${day}/${year}, ${displayHours}:${minutes} ${ampm}`;
         }
 
         function getActionButtons(email) {

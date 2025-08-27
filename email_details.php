@@ -167,6 +167,37 @@ if (!$email) {
                                         <?php endif; ?>
                                     </div>
                                 </div>
+
+                                <?php if (!empty($email['note'])): ?>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Current Note</label>
+                                    <div class="border rounded p-3 bg-info bg-opacity-10">
+                                        <p class="mb-0">
+                                            <i class="fas fa-sticky-note me-2 text-info"></i>
+                                            <?php echo nl2br(htmlspecialchars($email['note'])); ?>
+                                        </p>
+                                    </div>
+                                </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+
+                        <!-- Note Field Card -->
+                        <div class="card my-4">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-sticky-note me-2"></i>
+                                    Notes
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="noteField" class="form-label fw-bold">Add or Update Note</label>
+                                    <textarea class="form-control" id="noteField" rows="4" placeholder="Enter your notes here..."><?php echo htmlspecialchars($email['note'] ?? ''); ?></textarea>
+                                </div>
+                                <button class="btn btn-primary w-25" onclick="updateNote(<?php echo $email_id; ?>)">
+                                    <i class="fas fa-save me-2"></i>Update Note
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -271,6 +302,8 @@ if (!$email) {
                                 </a>
                             </div>
                         </div>
+
+                        
 
                         <!-- Activity Log Card -->
                         <div class="card">
@@ -744,6 +777,61 @@ if (!$email) {
                     icon: 'error',
                     title: 'Error',
                     text: 'Failed to assign email. Please try again.'
+                });
+            });
+        }
+
+        function updateNote(emailId) {
+            const note = document.getElementById('noteField').value;
+            if (!note) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Empty Note',
+                    text: 'Please enter a note to update.'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Updating Note...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('query/update_note.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'email_id=' + emailId + '&note=' + encodeURIComponent(note)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Note Updated',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message
+                    });
+                }
+            })
+            .catch(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Request Failed',
+                    text: 'Please try again.'
                 });
             });
         }
