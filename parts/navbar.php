@@ -14,9 +14,7 @@
                     <div>Loading notifications...</div>
                   </div>
                 </div>
-                <div class="notification-footer text-center py-2">
-                  <a href="parts/index/pending_email.php" class="small">View all pending emails</a>
-                </div>
+               
               </div>
             </li>
            

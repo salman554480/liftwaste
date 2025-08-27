@@ -7,6 +7,9 @@ error_reporting(E_ALL);
 // Set response header
 header('Content-Type: application/json');
 
+// Set timezone to North Carolina Eastern Standard Time
+date_default_timezone_set('America/New_York');
+
 require_once('parts/db.php');
 
 // Check connection
@@ -59,9 +62,12 @@ file_put_contents('messages_log.txt', $log_entry, FILE_APPEND);
 $sender_escaped = mysqli_real_escape_string($conn, $sender);
 $msg_escaped = mysqli_real_escape_string($conn, $msg);
 
+// Get current date and time in North Carolina Eastern Standard Time
+$current_datetime = date('Y-m-d H:i:s');
+
 // Insert into database
-$sql = "INSERT INTO email (sender, body_html)
-        VALUES ('$sender_escaped', '$msg_escaped')";
+$sql = "INSERT INTO email (sender, body_html, received_at)
+        VALUES ('$sender_escaped', '$msg_escaped', '$current_datetime')";
 $result = mysqli_query($conn, $sql);
 
 if ($result) {

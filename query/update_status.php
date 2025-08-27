@@ -1,4 +1,7 @@
 <?php
+// Set timezone to North Carolina Eastern Time
+date_default_timezone_set('America/New_York');
+
 require_once('../parts/db.php');
 
 header('Content-Type: application/json');
@@ -40,7 +43,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($email_id > 0 ) {
-        $now = date('Y-m-d H:i:s');
+        // Check if user is trying to assign a new email and already has an assigned email
+        if ($new_status == 'assigned' && !empty($admin_email)) {
+            $check_assigned = "SELECT COUNT(*) as assigned_count FROM email WHERE admin_id = ? AND status = 'assigned'";
+            $stmt_check = mysqli_prepare($conn, $check_assigned);
+            if ($stmt_check) {
+                mysqli_stmt_bind_param($stmt_check, "i", $admin_id);
+                mysqli_stmt_execute($stmt_check);
+                $result_check = mysqli_stmt_get_result($stmt_check);
+                $assigned_data = mysqli_fetch_assoc($result_check);
+                mysqli_stmt_close($stmt_check);
+                
+                if ($assigned_data['assigned_count'] > 0) {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'You already have an assigned email. Please complete it before taking on a new one.'
+                    ]);
+                    exit();
+                }
+            } else {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Database error while checking assignments'
+                ]);
+                exit();
+            }
+        }
+        
+        $now = date('Y-m-d H:i:s'); // Current time in North Carolina Eastern Time
         
         // Determine which timestamp field to update based on status
         $timestamp_field = '';

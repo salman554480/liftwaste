@@ -208,8 +208,47 @@ if (!$email) {
                             </div>
                         </div>
 
-                        <!-- Actions Card -->
-                        <div class="card mb-4">
+                       
+
+                        <!-- Admin Actions Card -->
+                        <div class="card mb-4" id="adminActionsCard" style="display: none;">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-user-shield me-2"></i>
+                                    Admin Actions
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="assignToUser" class="form-label fw-bold">Assign Email To User</label>
+                                    <select class="form-select" id="assignToUser">
+                                        <option value="">Select a user...</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-warning w-100" onclick="assignToUser(<?php echo $email_id; ?>)" id="assignToUserBtn" disabled>
+                                    <i class="fas fa-user-plus me-2"></i>Assign to Selected User
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Admin Access Button -->
+                        <div class="card mb-4" id="adminAccessCard">
+                            <div class="card-header bg-secondary text-white">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-user-shield me-2"></i>
+                                    Admin Access
+                                </h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <p class="text-muted mb-3">Need to assign emails to other users?</p>
+                                <button class="btn btn-secondary" onclick="checkAdminStatus()">
+                                    <i class="fas fa-key me-2"></i>Verify Admin Access
+                                </button>
+                            </div>
+                        </div>
+
+                         <!-- Actions Card -->
+                         <div class="card mb-4">
                             <div class="card-header">
                                 <h6 class="card-title mb-0">
                                     <i class="fas fa-tools me-2"></i>
@@ -526,6 +565,185 @@ if (!$email) {
                     icon: 'error',
                     title: 'Request Failed',
                     text: 'Please try again.'
+                });
+            });
+        }
+
+        // Admin Functions
+        function checkAdminStatus() {
+            Swal.fire({
+                title: 'Admin Access Verification',
+                html: `
+                    <div class="mb-3">
+                        <label for="admin_email" class="form-label">Your Email Address</label>
+                        <input type="email" id="admin_email" class="form-control" placeholder="Enter your email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="admin_password" class="form-label">Your Password</label>
+                        <input type="password" id="admin_password" class="form-control" placeholder="Enter your password">
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Verify',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    const email = document.getElementById('admin_email').value;
+                    const password = document.getElementById('admin_password').value;
+                    
+                    if (!email || !password) {
+                        Swal.showValidationMessage('Please enter both email and password');
+                        return false;
+                    }
+                    
+                    return { email, password };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    verifyAdminAndLoadUsers(result.value.email, result.value.password);
+                }
+            });
+        }
+
+        function verifyAdminAndLoadUsers(email, password) {
+            Swal.fire({
+                title: 'Verifying Admin...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // First authenticate admin
+            fetch('query/authenticate_user.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.user.admin_role === 'admin') {
+                    // Admin verified, load users
+                    return fetch('query/get_users.php');
+                } else {
+                    throw new Error(data.user && data.user.admin_role !== 'admin' ? 'You need admin privileges' : data.message);
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadUsersIntoSelect(data.users);
+                    showAdminSection();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Admin Access Granted',
+                        text: 'You can now assign emails to users',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } else {
+                    throw new Error(data.message || 'Failed to load users');
+                }
+            })
+            .catch((error) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Access Denied',
+                    text: error.message || 'Authentication failed'
+                });
+            });
+        }
+
+        function loadUsersIntoSelect(users) {
+            const select = document.getElementById('assignToUser');
+            select.innerHTML = '<option value="">Select a user...</option>';
+            
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.admin_email;
+                option.textContent = `${user.admin_name} (${user.admin_email})`;
+                select.appendChild(option);
+            });
+
+            // Enable/disable assign button based on selection
+            select.addEventListener('change', function() {
+                const assignBtn = document.getElementById('assignToUserBtn');
+                assignBtn.disabled = !this.value;
+            });
+        }
+
+        function showAdminSection() {
+            document.getElementById('adminActionsCard').style.display = 'block';
+            document.getElementById('adminAccessCard').style.display = 'none';
+        }
+
+        function assignToUser(emailId) {
+            const selectedUser = document.getElementById('assignToUser').value;
+            if (!selectedUser) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No User Selected',
+                    text: 'Please select a user to assign the email to.'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Confirm Assignment',
+                text: `Are you sure you want to assign this email to ${selectedUser}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Assign',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    performUserAssignment(emailId, selectedUser);
+                }
+            });
+        }
+
+        function performUserAssignment(emailId, userEmail) {
+            Swal.fire({
+                title: 'Assigning Email...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('query/update_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'email_id=' + emailId + '&status=assigned&admin_email=' + encodeURIComponent(userEmail)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Email Assigned',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Assignment Failed',
+                        text: data.message
+                    });
+                }
+            })
+            .catch((error) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to assign email. Please try again.'
                 });
             });
         }
