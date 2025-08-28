@@ -182,21 +182,41 @@ if (!$email) {
                             </div>
                         </div>
 
-                        <!-- Note Field Card -->
+                        <!-- Notes Display Card -->
                         <div class="card my-4">
                             <div class="card-header">
                                 <h6 class="card-title mb-0">
                                     <i class="fas fa-sticky-note me-2"></i>
-                                    Notes
+                                    Notes History
                                 </h6>
                             </div>
                             <div class="card-body">
-                                <div class="mb-3">
-                                    <label for="noteField" class="form-label fw-bold">Add or Update Note</label>
-                                    <textarea class="form-control" id="noteField" rows="4" placeholder="Enter your notes here..."><?php echo htmlspecialchars($email['note'] ?? ''); ?></textarea>
+                                <div id="notesContainer">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-spinner fa-spin"></i> Loading notes...
+                                    </div>
                                 </div>
-                                <button class="btn btn-primary w-25" onclick="updateNote(<?php echo $email_id; ?>)">
-                                    <i class="fas fa-save me-2"></i>Update Note
+                                
+                                <hr class="my-3">
+                                
+                                <!-- Add New Note Section -->
+                                <div class="mb-3">
+                                    <label for="newNoteField" class="form-label fw-bold">Add New Note</label>
+                                    <textarea class="form-control" id="newNoteField" rows="3" placeholder="Enter your note here..."></textarea>
+                                </div>
+                                
+                                <!-- Authentication Fields -->
+                                <div class="row g-2 mb-3">
+                                    <div class="col-md-6">
+                                        <input type="email" class="form-control" id="noteAdminEmail" placeholder="Your Email" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="password" class="form-control" id="noteAdminPassword" placeholder="Your Password" required>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary w-100" onclick="addNewNote(<?php echo $email_id; ?>)">
+                                    <i class="fas fa-plus me-2"></i>Add Note
                                 </button>
                             </div>
                         </div>
@@ -781,48 +801,114 @@ if (!$email) {
             });
         }
 
-        function updateNote(emailId) {
-            const note = document.getElementById('noteField').value;
-            if (!note) {
+        // Load notes when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotes(<?php echo $email_id; ?>);
+        });
+
+        function loadNotes(emailId) {
+            fetch('query/get_notes.php?email_id=' + emailId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayNotes(data.notes);
+                    } else {
+                        document.getElementById('notesContainer').innerHTML = 
+                            '<div class="alert alert-warning">No notes found for this email.</div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('notesContainer').innerHTML = 
+                        '<div class="alert alert-danger">Failed to load notes. Please try again.</div>';
+                });
+        }
+
+        function displayNotes(notes) {
+            const container = document.getElementById('notesContainer');
+            
+            if (notes.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">No notes added yet. Be the first to add a note!</div>';
+                return;
+            }
+
+            let html = '';
+            notes.forEach(note => {
+                const noteDate = formatDateTime(note.created_at);
+                const roleBadge = note.admin_role === 'admin' ? 'bg-danger' : 'bg-primary';
+                
+                html += `
+                    <div class="border rounded p-3 mb-3 bg-light">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="badge ${roleBadge} me-2">${note.admin_role}</span>
+                                <strong class="text-primary">${note.admin_name}</strong>
+                                <small class="text-muted ms-2">(${note.admin_email})</small>
+                            </div>
+                            <small class="text-muted">${noteDate}</small>
+                        </div>
+                        <p class="mb-0">${note.note_text}</p>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function addNewNote(emailId) {
+            const noteText = document.getElementById('newNoteField').value.trim();
+            const adminEmail = document.getElementById('noteAdminEmail').value.trim();
+            const adminPassword = document.getElementById('noteAdminPassword').value;
+
+            if (!noteText || !adminEmail || !adminPassword) {
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Empty Note',
-                    text: 'Please enter a note to update.'
+                    title: 'Missing Information',
+                    text: 'Please fill in all fields: note text, email, and password.'
                 });
                 return;
             }
 
             Swal.fire({
-                title: 'Updating Note...',
+                title: 'Adding Note...',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
 
+            const formData = new FormData();
+            formData.append('email_id', emailId);
+            formData.append('note', noteText);
+            formData.append('admin_email', adminEmail);
+            formData.append('admin_password', adminPassword);
+
             fetch('query/update_note.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: 'email_id=' + emailId + '&note=' + encodeURIComponent(note)
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Note Updated',
+                        title: 'Note Added Successfully',
                         text: data.message,
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
-                        location.reload();
+                        // Clear the form
+                        document.getElementById('newNoteField').value = '';
+                        document.getElementById('noteAdminEmail').value = '';
+                        document.getElementById('noteAdminPassword').value = '';
+                        
+                        // Reload notes
+                        loadNotes(emailId);
                     });
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error',
+                        title: 'Failed to Add Note',
                         text: data.message
                     });
                 }
@@ -834,5 +920,19 @@ if (!$email) {
                     text: 'Please try again.'
                 });
             });
+        }
+
+        function formatDateTime(dateString) {
+            if (!dateString) return 'Not set';
+            const date = new Date(dateString);
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = date.getHours();
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            
+            return `${month}/${day}/${year}, ${displayHours}:${minutes} ${ampm}`;
         }
     </script>
