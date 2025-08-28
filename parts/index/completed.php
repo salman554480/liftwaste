@@ -28,7 +28,7 @@
                                 $body_html = $row_pending['body_html'];
                                 $recipient = $row_pending['recipient'];
                                 $received_at = $row_pending['received_at'];
-
+                                $sender_email = $row_pending['sender_email'];
                                 $first_letter = $sender[0];
 
                                 $date = new DateTime($received_at);
@@ -44,7 +44,7 @@
                                     <td><span class="avatar bg-secondary text-white rounded-circle me-2"><?php echo $first_letter; ?></span> <?php echo $sender; ?></td>
                                     <td><?php echo $subject; ?></td>
                                     <td><?php echo $formatted_date; ?></td>
-                                    <td><?php echo $recipient; ?></td>
+                                    <td><?php echo $sender_email; ?></td>
                                     <td><span class="badge bg-success"><i class="fa fa-check-double"></i> Completed</span></td>
                                     <td><?php echo $assign_to_name; ?></td>
                                     <td>
