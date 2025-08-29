@@ -1,8 +1,8 @@
 <div class="accordion-body">
     <div class="card mail-card mb-0">
         <div class="card-body">
-            <div class="table-responsive">
-            <table class="table align-middle">
+            <div class="table-scroll">
+                <table class="table align-middle">
                     <thead class="table-light">
                         <tr>
                             <th>Username</th>
@@ -10,14 +10,14 @@
                             <th>Date - Time</th>
                             <th>Mails/Phone</th>
                             <th>Status</th>
-                            <th>Assign To</th>
+                            <th>Completed by</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
                         // Show all completed emails for everyone
-                        $select_pending = "SELECT * FROM email WHERE status = 'completed' ORDER BY id DESC LIMIT 5";
+                        $select_pending = "SELECT * FROM email WHERE status = 'completed' ORDER BY id ASC";
                         $result_pending = mysqli_query($conn, $select_pending);
                         if (mysqli_num_rows($result_pending) > 0) {
                             while ($row_pending = mysqli_fetch_assoc($result_pending)) {
@@ -32,7 +32,7 @@
                                 $first_letter = $sender[0];
 
                                 $date = new DateTime($received_at);
-                                $formatted_date = $date->format('d.m.Y - h.i A');
+                                $formatted_date = $date->format('m/d/Y - h:i A');
 
                                 $select_assign_to = "SELECT * FROM admins WHERE admin_id = '$assign_to'";
                                 $result_assign_to = mysqli_query($conn, $select_assign_to);

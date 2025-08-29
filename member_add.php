@@ -96,7 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="admin_password" placeholder="Enter password" required>
+                <div class="input-group">
+                  <input type="password" class="form-control" id="password" name="admin_password" placeholder="Enter password" required>
+                  <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                    <i class="fas fa-eye" id="eyeIcon"></i>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -115,6 +120,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </div>
 
   <?php require_once('parts/footer.php'); ?>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const togglePassword = document.getElementById('togglePassword');
+      const password = document.getElementById('password');
+      const eyeIcon = document.getElementById('eyeIcon');
+      
+      togglePassword.addEventListener('click', function() {
+        // Toggle password visibility
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        
+        // Toggle eye icon
+        if (type === 'text') {
+          eyeIcon.classList.remove('fa-eye');
+          eyeIcon.classList.add('fa-eye-slash');
+        } else {
+          eyeIcon.classList.remove('fa-eye-slash');
+          eyeIcon.classList.add('fa-eye');
+        }
+      });
+    });
+  </script>
 </body>
 
 </html>

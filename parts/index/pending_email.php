@@ -5,7 +5,7 @@ $count_user_pending_task = 0; // Set to 0 to allow unlimited assignments
 <div class="accordion-body">
   <div class="card mail-card mb-0">
     <div class="card-body">
-      <div class="table-responsive">
+      <div class="table-scroll">
         <table class="table align-middle">
           <thead class="table-light">
             <tr>
@@ -19,7 +19,7 @@ $count_user_pending_task = 0; // Set to 0 to allow unlimited assignments
           </thead>
           <tbody>
             <?php
-            $select_pending = "SELECT * FROM email WHERE status = 'pending' ORDER BY id DESC LIMIT 5";
+            $select_pending = "SELECT * FROM email WHERE status = 'pending' ORDER BY id ASC";
             $result_pending = mysqli_query($conn, $select_pending);
             if (mysqli_num_rows($result_pending) > 0) {
               while ($row_pending = mysqli_fetch_assoc($result_pending)) {
@@ -34,7 +34,7 @@ $count_user_pending_task = 0; // Set to 0 to allow unlimited assignments
                 $first_letter = $sender[0];
 
                 $date = new DateTime($received_at);
-                $formatted_date = $date->format('d.m.Y - h.i A');
+                $formatted_date = $date->format('m/d/Y - h:i A');
 
 
             ?>

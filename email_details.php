@@ -335,7 +335,7 @@ if (!$email) {
                             </div>
                             <div class="card-body">
                                 <div class="timeline">
-                                    <!-- Received -->
+                                    <!-- Received - Always shown -->
                                     <div class="timeline-item">
                                         <div class="timeline-marker bg-primary">
                                             <i class="fas fa-envelope text-white"></i>
@@ -343,13 +343,13 @@ if (!$email) {
                                         <div class="timeline-content">
                                             <h6 class="mb-1">Email Received</h6>
                                             <p class="text-muted mb-0">
-                                                <?php echo date('M d, Y \a\t h:i A', strtotime($email['received_at'])); ?>
+                                                <?php echo date('m/d/Y \a\t h:i A', strtotime($email['received_at'])); ?>
                                             </p>
                                         </div>
                                     </div>
 
-                                    <!-- Assigned -->
-                                    <?php if ($email['assigned_at']): ?>
+                                    <!-- Assigned - Only show if status is assigned or completed -->
+                                    <?php if (in_array($email['status'], ['assigned', 'completed']) && $email['assigned_at']): ?>
                                     <div class="timeline-item">
                                         <div class="timeline-marker bg-warning">
                                             <i class="fas fa-user-check text-white"></i>
@@ -357,7 +357,7 @@ if (!$email) {
                                         <div class="timeline-content">
                                             <h6 class="mb-1">Email Assigned</h6>
                                             <p class="text-muted mb-0">
-                                                <?php echo date('M d, Y \a\t h:i A', strtotime($email['assigned_at'])); ?>
+                                                <?php echo date('m/d/Y \a\t h:i A', strtotime($email['assigned_at'])); ?>
                                             </p>
                                             <?php if ($email['assigned_admin_name']): ?>
                                                 <small class="text-info">
@@ -368,8 +368,8 @@ if (!$email) {
                                     </div>
                                     <?php endif; ?>
 
-                                    <!-- Completed -->
-                                    <?php if ($email['completed_at']): ?>
+                                    <!-- Completed - Only show if status is completed -->
+                                    <?php if ($email['status'] === 'completed' && $email['completed_at']): ?>
                                     <div class="timeline-item">
                                         <div class="timeline-marker bg-success">
                                             <i class="fas fa-check-circle text-white"></i>
@@ -377,7 +377,7 @@ if (!$email) {
                                         <div class="timeline-content">
                                             <h6 class="mb-1">Email Completed</h6>
                                             <p class="text-muted mb-0">
-                                                <?php echo date('M d, Y \a\t h:i A', strtotime($email['completed_at'])); ?>
+                                                <?php echo date('m/d/Y \a\t h:i A', strtotime($email['completed_at'])); ?>
                                             </p>
                                         </div>
                                     </div>
@@ -933,6 +933,6 @@ if (!$email) {
             const ampm = hours >= 12 ? 'PM' : 'AM';
             const displayHours = hours % 12 || 12;
             
-            return `${month}/${day}/${year}, ${displayHours}:${minutes} ${ampm}`;
+            return `${month}/${day}/${year} - ${displayHours}:${minutes} ${ampm}`;
         }
     </script>

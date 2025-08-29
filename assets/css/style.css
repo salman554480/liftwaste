@@ -104,6 +104,19 @@ table{
   vertical-align: middle;
 }
 
+/* Simple table scrolling */
+.table-scroll {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.table-scroll .table thead th {
+  position: sticky;
+  top: 0;
+  background: #f8f9fa;
+  z-index: 10;
+}
+
 /* Misc */
 body {
   background: #f5f6fa;

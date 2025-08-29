@@ -6,6 +6,10 @@ error_reporting(E_ALL);
 // Include DB connection (uses $conn)
 require_once('parts/db.php');
 
+// Set timezone to North Carolina Eastern Standard Time
+date_default_timezone_set('America/New_York');
+
+
 // Get raw POST body
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
@@ -23,13 +27,16 @@ $subject       = isset($data['subject']) ? "'" . mysqli_real_escape_string($conn
 $body_text     = isset($data['body_text']) ? "'" . mysqli_real_escape_string($conn, $data['body_text']) . "'" : "NULL";
 $body_html     = isset($data['body_html']) ? "'" . mysqli_real_escape_string($conn, $data['body_html']) . "'" : "NULL";
 
+// Get current date and time in North Carolina Eastern Standard Time
+$current_datetime = date('Y-m-d H:i:s');
+
 // Build query
 $sql = "
     INSERT INTO email (
         sender, status, received_at, 
         sender_email, recipient, subject, body_text, body_html
     ) VALUES (
-        $sender, 'pending', NOW(),
+        $sender, 'pending', '$current_datetime',
         $sender_email, $recipient, $subject, $body_text, $body_html
     )
 ";

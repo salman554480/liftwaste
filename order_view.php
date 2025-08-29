@@ -156,8 +156,8 @@ $page= "order_view";
                                         <p><strong>Recipient:</strong> ${email.recipient}</p>
                                         <p><strong>Status:</strong> <span class="badge ${statusClass}">${email.status}</span></p>
                                         <p><strong>Received:</strong> ${receivedDate}</p>
-                                        <p><strong>Assigned:</strong> ${assignedDate}</p>
-                                        <p><strong>Completed:</strong> ${completedDate}</p>
+                                        ${email.status === 'assigned' || email.status === 'completed' ? `<p><strong>Assigned:</strong> ${assignedDate}</p>` : ''}
+                                        ${email.status === 'completed' ? `<p><strong>Completed:</strong> ${completedDate}</p>` : ''}
                                     </div>
                                     <div class="col-md-6">
                                         <h6>Actions</h6>
