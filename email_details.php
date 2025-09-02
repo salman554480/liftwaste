@@ -44,7 +44,7 @@ if (!$email) {
         <!-- Page Content -->
         <div id="page-content-wrapper" class="flex-grow-1">
             <!-- Topbar -->
-            <?php require_once('parts/navbar.php'); ?>
+            <?php // require_once('parts/navbar.php'); ?>
             <!-- /Topbar -->
 
             <div class="container-fluid py-4">
@@ -261,42 +261,7 @@ if (!$email) {
 
                        
 
-                        <!-- Admin Actions Card -->
-                        <div class="card mb-4" id="adminActionsCard" style="display: none;">
-                            <div class="card-header bg-warning text-dark">
-                                <h6 class="card-title mb-0">
-                                    <i class="fas fa-user-shield me-2"></i>
-                                    Admin Actions
-                                </h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label for="assignToUser" class="form-label fw-bold">Assign Email To User</label>
-                                    <select class="form-select" id="assignToUser">
-                                        <option value="">Select a user...</option>
-                                    </select>
-                                </div>
-                                <button class="btn btn-warning w-100" onclick="assignToUser(<?php echo $email_id; ?>)" id="assignToUserBtn" disabled>
-                                    <i class="fas fa-user-plus me-2"></i>Assign to Selected User
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Admin Access Button -->
-                        <div class="card mb-4" id="adminAccessCard">
-                            <div class="card-header bg-secondary text-white">
-                                <h6 class="card-title mb-0">
-                                    <i class="fas fa-user-shield me-2"></i>
-                                    Admin Access
-                                </h6>
-                            </div>
-                            <div class="card-body text-center">
-                                <p class="text-muted mb-3">Need to assign emails to other users?</p>
-                                <button class="btn btn-secondary" onclick="checkAdminStatus()">
-                                    <i class="fas fa-key me-2"></i>Verify Admin Access
-                                </button>
-                            </div>
-                        </div>
+                        
 
                          <!-- Actions Card -->
                          <div class="card mb-4">
@@ -317,9 +282,7 @@ if (!$email) {
                                     </button>
                                 <?php endif; ?>
                                 
-                                <a href="mailto:<?php echo htmlspecialchars($email['sender_email']); ?>" class="btn btn-outline-primary w-100">
-                                    <i class="fas fa-reply me-2"></i>Reply to Sender
-                                </a>
+                               
                             </div>
                         </div>
 

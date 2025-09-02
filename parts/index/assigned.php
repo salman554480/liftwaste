@@ -53,9 +53,9 @@
                                             <a href="email_details.php?id=<?php echo $id; ?>" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-eye"></i> View
                                             </a>
-                                            <button class="btn btn-success btn-sm complete-btn" data-id="<?php echo $id; ?>">
+                                            <!--<button class="btn btn-success btn-sm complete-btn" data-id="<?php echo $id; ?>">
                                                 <i class="fa fa-check"></i> Mark as Completed
-                                            </button>
+                                            </button>-->
                                         </div>
                                     </td>
                                 </tr>
