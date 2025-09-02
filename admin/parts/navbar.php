@@ -19,14 +19,14 @@
        <li class="nav-item dropdown">
          <a class="nav-link p-0" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown"
            aria-expanded="false">
-           <img src="<?php echo !empty($admin_image) ? 'uploads/' . $admin_image : 'assets/images/default-avatar.svg'; ?>"
+           <img src="assets/img/favicon.png"
              alt="Profile" class="rounded-circle"
              width="40" height="40" style="object-fit: cover;">
          </a>
          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
            <li class="dropdown-header">
              <div class="d-flex align-items-center">
-               <img src="<?php echo !empty($admin_image) ? 'uploads/' . $admin_image : 'assets/images/default-avatar.svg'; ?>"
+               <img src="assets/img/favicon.png"
                  alt="Profile" class="rounded-circle me-2"
                  width="32" height="32" style="object-fit: cover;">
                <div>

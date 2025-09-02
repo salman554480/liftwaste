@@ -1,12 +1,11 @@
 <?php 
-require_once('parts/top.php'); 
+require_once('parts/db.php');
 session_start();
 // If already logged in, redirect
 if (isset($_SESSION['admin_id'])) {
     header("Location: index.php");
     exit;
 }
-
 $error = '';
 
 // Handle login

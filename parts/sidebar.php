@@ -8,7 +8,7 @@
         <a href="index.php" class="list-group-item list-group-item-action <?php if($page == 'index') { echo 'active'; } ?>"><i
             class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
 
-            <a href="index.php" target="_blank" class="list-group-item list-group-item-action"><i
+            <a href="admin/index.php" target="_blank" class="list-group-item list-group-item-action"><i
             class="fas fa-user me-2"></i>Admin Panel</a>     
       
       </div>

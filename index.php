@@ -13,7 +13,7 @@ $page= "index";
     <div id="page-content-wrapper" class="flex-grow-1">
       <!-- Topbar -->
       
-      <?php // require_once('parts/navbar.php'); ?>
+      <?php  require_once('parts/navbar.php'); ?>
       <!-- /Topbar -->
 
       <div class="container-fluid py-4">
