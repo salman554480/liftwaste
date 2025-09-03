@@ -1,6 +1,9 @@
 <?php
 require_once('../parts/db.php');
 
+// Set timezone to North Carolina Eastern Standard Time (same as IMAP connection)
+date_default_timezone_set('America/New_York');
+
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

@@ -1,6 +1,9 @@
 <?php
 require_once('../parts/db.php');
 
+// Set timezone to North Carolina Eastern Standard Time (same as IMAP connection)
+date_default_timezone_set('America/New_York');
+
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -14,31 +17,30 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $email_id = $_POST['email_id'] ?? '';
 $note_text = $_POST['note'] ?? '';
 $admin_email = $_POST['admin_email'] ?? '';
-$admin_password = $_POST['admin_password'] ?? '';
 
 // Validate required fields
-if (empty($email_id) || empty($note_text) || empty($admin_email) || empty($admin_password)) {
+if (empty($email_id) || empty($note_text) || empty($admin_email)) {
     echo json_encode([
         'success' => false,
-        'message' => 'All fields are required: email_id, note, admin_email, admin_password'
+        'message' => 'All fields are required: email_id, note, admin_email'
     ]);
     exit();
 }
 
 try {
-    // First authenticate the user
-    $auth_query = "SELECT admin_id, admin_name, admin_role FROM admins WHERE admin_email = ? AND admin_password = ?";
+    // First authenticate the user by email only (session-based auth)
+    $auth_query = "SELECT admin_id, admin_name, admin_role FROM admins WHERE admin_email = ?";
     $stmt_auth = mysqli_prepare($conn, $auth_query);
     
     if ($stmt_auth) {
-        mysqli_stmt_bind_param($stmt_auth, "ss", $admin_email, $admin_password);
+        mysqli_stmt_bind_param($stmt_auth, "s", $admin_email);
         mysqli_stmt_execute($stmt_auth);
         $result_auth = mysqli_stmt_get_result($stmt_auth);
         
         if (mysqli_num_rows($result_auth) === 0) {
             echo json_encode([
                 'success' => false,
-                'message' => 'Invalid email or password'
+                'message' => 'Invalid admin email'
             ]);
             exit();
         }
@@ -61,7 +63,7 @@ try {
                     'success' => true,
                     'message' => 'Note added successfully',
                     'admin_name' => $admin_name,
-                    'timestamp' => date('Y-m-d H:i:s')
+                    'timestamp' => date('Y-m-d H:i:s') // Uses America/New_York timezone
                 ]);
             } else {
                 echo json_encode([

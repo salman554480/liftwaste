@@ -8,7 +8,7 @@ try {
     $query = "SELECT e.*, a.admin_name as admin_username 
               FROM email e 
               LEFT JOIN admins a ON e.admin_id = a.admin_id 
-              ORDER BY e.received_at DESC";
+              ORDER BY e.id ASC";
     
     $result = mysqli_query($conn, $query);
     

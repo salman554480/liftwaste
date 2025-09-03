@@ -253,7 +253,8 @@ if (!$email) {
 
 
 
-                        <!-- Admin Actions Card -->
+                        <!-- Admin Actions Card - Only show for pending or assigned emails -->
+                        <?php if (in_array($email['status'], ['pending', 'assigned'])): ?>
                         <div class="card mb-4" id="adminActionsCard">
                             <div class="card-header bg-warning text-dark">
                                 <h6 class="card-title mb-0">
@@ -273,6 +274,7 @@ if (!$email) {
                                 </button>
                             </div>
                         </div>
+                        <?php endif; ?>
 
 
 
@@ -698,7 +700,9 @@ if (!$email) {
         // Load notes when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadNotes(<?php echo $email_id; ?>);
+            <?php if (in_array($email['status'], ['pending', 'assigned'])): ?>
             loadUsers(); // Automatically load users for admin actions
+            <?php endif; ?>
         });
 
         function loadUsers() {

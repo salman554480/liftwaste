@@ -13,5 +13,8 @@ CREATE TABLE IF NOT EXISTS email_notes (
     INDEX idx_created_at (created_at)
 );
 
+-- Note: The created_at column will use the server's timezone setting
+-- Make sure to set timezone to 'America/New_York' in your PHP scripts
+
 -- Optional: Add some sample data for testing
 -- INSERT INTO email_notes (admin_id, email_id, note_text) VALUES (1, 1, 'Initial note for testing');
