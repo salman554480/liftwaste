@@ -2,8 +2,8 @@
 require_once('parts/top.php'); 
 
 // If already logged in, redirect
-if (isset($_SESSION['admin_id'])) {
-    header("Location: dashboard.php");
+if (isLoggedIn()) {
+    header("Location: index.php");
     exit;
 }
 
@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($password === $admin['admin_password']) {
             $_SESSION['admin_id'] = $admin['admin_id'];
             $_SESSION['admin_name'] = $admin['admin_name'];
+            $_SESSION['admin_email'] = $admin['admin_email'];
             $_SESSION['admin_role'] = $admin['admin_role'];
 
             header("Location: index.php");

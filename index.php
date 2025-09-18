@@ -1,5 +1,8 @@
 <?php require_once('parts/top.php');
 $page= "index";
+
+// Require login for dashboard access
+requireLogin();
 ?>
 </head>
 <body>

@@ -2,11 +2,8 @@
 require_once('parts/top.php'); 
 $page = "profile";
 
-// Check if user is admingit 
-if (!isset($_SESSION['admin_role']) || $_SESSION['admin_role'] !== 'admin') {
-    header('Location: index.php');
-    exit();
-}
+// Require login for profile access
+requireLogin();
 
 // Get admin information
 $admin_id = $_SESSION['admin_id'];

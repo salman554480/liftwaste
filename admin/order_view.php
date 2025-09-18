@@ -144,6 +144,11 @@ $page= "order_view";
                                         onclick="viewEmailDetails(${email.id})">
                                     <i class="fas fa-eye"></i>
                                 </button>
+                                <button class="btn btn-sm btn-outline-danger me-2 delete-email-btn" 
+                                        data-email-id="${email.id}" 
+                                        data-email-subject="${email.subject.replace(/"/g, '&quot;')}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                                 <i class="fas fa-chevron-down text-muted"></i>
                             </div>
                         </div>
@@ -180,6 +185,16 @@ $page= "order_view";
             });
             
             container.innerHTML = html;
+            
+            // Add event listeners for delete buttons
+            document.querySelectorAll('.delete-email-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const emailId = this.getAttribute('data-email-id');
+                    const subject = this.getAttribute('data-email-subject');
+                    console.log('Delete button clicked for email ID:', emailId, 'Subject:', subject);
+                    deleteEmail(emailId, subject);
+                });
+            });
         }
 
         function getStatusClass(status) {
@@ -223,6 +238,8 @@ $page= "order_view";
                     </button>
                 `;
             }
+            
+            // Delete button is now in the header section
             
             return buttons;
         }
@@ -309,6 +326,81 @@ $page= "order_view";
                 } else {
                     card.style.display = 'none';
                 }
+            });
+        }
+
+        function deleteEmail(emailId, subject) {
+            console.log('deleteEmail function called with:', emailId, subject);
+            // Show delete confirmation popup
+            Swal.fire({
+                title: 'Delete Email',
+                html: `
+                    <p>Are you sure you want to delete this email?</p>
+                    <div class="alert alert-warning">
+                        <strong>Subject:</strong> ${subject}
+                    </div>
+                    <p class="text-danger"><strong>Warning:</strong> This action cannot be undone!</p>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, Delete It!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    performDelete(emailId);
+                }
+            });
+        }
+
+        function performDelete(emailId) {
+            console.log('performDelete function called with emailId:', emailId);
+            console.log('Making request to: ../query/delete_email.php');
+            Swal.fire({
+                title: 'Deleting Email...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const requestBody = 'email_id=' + emailId;
+            console.log('Request body:', requestBody);
+            
+            fetch('query/delete_email.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: requestBody
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Email Deleted',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        loadEmails(); // Reload the emails
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Delete Failed',
+                        text: data.message
+                    });
+                }
+            })
+            .catch((error) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Request Failed',
+                    text: 'Failed to delete email. Please try again.'
+                });
             });
         }
     </script>

@@ -1,4 +1,8 @@
-<?php require_once('parts/top.php'); ?>
+<?php require_once('parts/top.php'); 
+
+// Require login for member view access
+requireLogin();
+?>
 </head>
 
 <body>

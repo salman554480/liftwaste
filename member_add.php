@@ -1,4 +1,8 @@
-<?php require_once('parts/top.php'); ?>
+<?php require_once('parts/top.php'); 
+
+// Require login for member add access
+requireLogin();
+?>
 
 <?php
 $message = '';

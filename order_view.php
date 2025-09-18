@@ -1,5 +1,8 @@
 <?php require_once('parts/top.php'); 
 $page= "order_view";
+
+// Require login for order view access
+requireLogin();
 ?>
 </head>
 

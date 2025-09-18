@@ -56,6 +56,9 @@
                                             <button class="btn btn-success btn-sm complete-btn" data-id="<?php echo $id; ?>">
                                                 <i class="fa fa-check"></i> Mark as Completed
                                             </button>
+                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $id; ?>" data-subject="<?php echo htmlspecialchars($subject); ?>">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -74,6 +77,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Complete button functionality
         document.querySelectorAll('.complete-btn').forEach(function(btn) {
             btn.addEventListener('click', function() {
                 const emailId = this.getAttribute('data-id');
@@ -108,6 +112,36 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         authenticateAndComplete(emailId, result.value.email, result.value.password);
+                    }
+                });
+            });
+        });
+
+        // Delete button functionality
+        document.querySelectorAll('.delete-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const emailId = this.getAttribute('data-id');
+                const subject = this.getAttribute('data-subject');
+                
+                // Show delete confirmation popup
+                Swal.fire({
+                    title: 'Delete Email',
+                    html: `
+                        <p>Are you sure you want to delete this email?</p>
+                        <div class="alert alert-warning">
+                            <strong>Subject:</strong> ${subject}
+                        </div>
+                        <p class="text-danger"><strong>Warning:</strong> This action cannot be undone!</p>
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, Delete It!',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        deleteEmail(emailId);
                     }
                 });
             });
@@ -171,6 +205,51 @@
                 icon: 'error',
                 title: 'Authentication Failed',
                 text: error.message || 'Please check your credentials and try again.'
+            });
+        });
+    }
+
+    function deleteEmail(emailId) {
+        Swal.fire({
+            title: 'Deleting Email...',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('query/delete_email.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'email_id=' + emailId
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Email Deleted',
+                    text: data.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Delete Failed',
+                    text: data.message
+                });
+            }
+        })
+        .catch((error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Request Failed',
+                text: 'Failed to delete email. Please try again.'
             });
         });
     }

@@ -2,6 +2,9 @@
 require_once('parts/top.php'); 
 $page = "email_details";
 
+// Require login for email details access
+requireLogin();
+
 // Get email ID from URL
 $email_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
