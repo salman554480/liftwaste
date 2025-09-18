@@ -208,16 +208,6 @@ if (!$email) {
                                     <textarea class="form-control" id="newNoteField" rows="3" placeholder="Enter your note here..."></textarea>
                                 </div>
                                 
-                                <!-- Authentication Fields -->
-                                <div class="row g-2 mb-3">
-                                    <div class="col-md-6">
-                                        <input type="email" class="form-control" id="noteAdminEmail" placeholder="Your Email" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="password" class="form-control" id="noteAdminPassword" placeholder="Your Password" required>
-                                    </div>
-                                </div>
-                                
                                 <button class="btn btn-primary w-100" onclick="addNewNote(<?php echo $email_id; ?>)">
                                     <i class="fas fa-plus me-2"></i>Add Note
                                 </button>
@@ -276,11 +266,11 @@ if (!$email) {
                             </div>
                             <div class="card-body">
                                 <?php if ($email['status'] === 'pending'): ?>
-                                    <button class="btn btn-primary w-100 mb-2" onclick="authenticateAndAssign(<?php echo $email_id; ?>)">
+                                    <button class="btn btn-primary w-100 mb-2" onclick="assignEmail(<?php echo $email_id; ?>)">
                                         <i class="fas fa-user-check me-2"></i>Assign to Me
                                     </button>
                                 <?php elseif ($email['status'] === 'assigned'): ?>
-                                    <button class="btn btn-success w-100 mb-2" onclick="authenticateAndComplete(<?php echo $email_id; ?>)">
+                                    <button class="btn btn-success w-100 mb-2" onclick="completeEmail(<?php echo $email_id; ?>)">
                                         <i class="fas fa-check me-2"></i>Mark as Completed
                                     </button>
                                 <?php endif; ?>
@@ -410,107 +400,54 @@ if (!$email) {
     </style>
 
     <script>
-        function authenticateAndAssign(emailId) {
+        function assignEmail(emailId) {
             Swal.fire({
-                title: 'Authentication Required',
-                html: `
-                    <div class="mb-3">
-                        <label for="auth_email" class="form-label">Email Address</label>
-                        <input type="email" id="auth_email" class="form-control" placeholder="Enter your email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="auth_password" class="form-label">Password</label>
-                        <input type="password" id="auth_password" class="form-control" placeholder="Enter your password">
-                    </div>
-                `,
+                title: 'Assign Email',
+                text: 'Are you sure you want to assign this email to yourself?',
+                icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Authenticate & Assign',
-                cancelButtonText: 'Cancel',
-                preConfirm: () => {
-                    const email = document.getElementById('auth_email').value;
-                    const password = document.getElementById('auth_password').value;
-                    
-                    if (!email || !password) {
-                        Swal.showValidationMessage('Please enter both email and password');
-                        return false;
-                    }
-                    
-                    return { email, password };
-                }
+                confirmButtonText: 'Yes, Assign',
+                cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    authenticateAndUpdateStatus(emailId, 'assigned', result.value.email, result.value.password);
+                    updateEmailStatus(emailId, 'assigned');
                 }
             });
         }
 
-        function authenticateAndComplete(emailId) {
+        function completeEmail(emailId) {
             Swal.fire({
-                title: 'Authentication Required',
-                html: `
-                    <div class="mb-3">
-                        <label for="auth_email" class="form-label">Email Address</label>
-                        <input type="email" id="auth_email" class="form-control" placeholder="Enter your email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="auth_password" class="form-label">Password</label>
-                        <input type="password" id="auth_password" class="form-control" placeholder="Enter your password">
-                    </div>
-                `,
+                title: 'Mark as Completed',
+                text: 'Are you sure you want to mark this email as completed?',
+                icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Authenticate & Complete',
-                cancelButtonText: 'Cancel',
-                preConfirm: () => {
-                    const email = document.getElementById('auth_email').value;
-                    const password = document.getElementById('auth_password').value;
-                    
-                    if (!email || !password) {
-                        Swal.showValidationMessage('Please enter both email and password');
-                        return false;
-                    }
-                    
-                    return { email, password };
-                }
+                confirmButtonText: 'Yes, Complete',
+                cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    authenticateAndUpdateStatus(emailId, 'completed', result.value.email, result.value.password);
+                    updateEmailStatus(emailId, 'completed');
                 }
             });
         }
 
-        function authenticateAndUpdateStatus(emailId, newStatus, email, password) {
+        function updateEmailStatus(emailId, newStatus) {
             const statusText = newStatus === 'assigned' ? 'Assigning...' : 'Updating...';
             
             Swal.fire({
-                title: 'Authenticating...',
+                title: statusText,
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
 
-            // First authenticate the user
-            fetch('query/authenticate_user.php', {
+            // Use session-based authentication (no password required)
+            fetch('query/update_status.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Authentication successful, now update status
-                    return fetch('query/update_status.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: 'email_id=' + emailId + '&status=' + newStatus + '&admin_email=' + encodeURIComponent(email)
-                    });
-                } else {
-                    throw new Error(data.message || 'Authentication failed');
-                }
+                body: 'email_id=' + emailId + '&status=' + newStatus
             })
             .then(response => response.json())
             .then(data => {
@@ -535,8 +472,8 @@ if (!$email) {
             .catch((error) => {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Authentication Failed',
-                    text: error.message || 'Please check your credentials and try again.'
+                    title: 'Update Failed',
+                    text: 'Please try again.'
                 });
             });
         }
@@ -823,14 +760,12 @@ if (!$email) {
 
         function addNewNote(emailId) {
             const noteText = document.getElementById('newNoteField').value.trim();
-            const adminEmail = document.getElementById('noteAdminEmail').value.trim();
-            const adminPassword = document.getElementById('noteAdminPassword').value;
 
-            if (!noteText || !adminEmail || !adminPassword) {
+            if (!noteText) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Missing Information',
-                    text: 'Please fill in all fields: note text, email, and password.'
+                    text: 'Please enter a note before submitting.'
                 });
                 return;
             }
@@ -846,8 +781,6 @@ if (!$email) {
             const formData = new FormData();
             formData.append('email_id', emailId);
             formData.append('note', noteText);
-            formData.append('admin_email', adminEmail);
-            formData.append('admin_password', adminPassword);
 
             fetch('query/update_note.php', {
                 method: 'POST',
@@ -865,8 +798,6 @@ if (!$email) {
                     }).then(() => {
                         // Clear the form
                         document.getElementById('newNoteField').value = '';
-                        document.getElementById('noteAdminEmail').value = '';
-                        document.getElementById('noteAdminPassword').value = '';
                         
                         // Reload notes
                         loadNotes(emailId);

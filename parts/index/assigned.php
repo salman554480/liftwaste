@@ -56,9 +56,6 @@
                                             <button class="btn btn-success btn-sm complete-btn" data-id="<?php echo $id; ?>">
                                                 <i class="fa fa-check"></i> Mark as Completed
                                             </button>
-                                            <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $id; ?>" data-subject="<?php echo htmlspecialchars($subject); ?>">
-                                                <i class="fas fa-trash"></i> Delete
-                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -82,103 +79,40 @@
             btn.addEventListener('click', function() {
                 const emailId = this.getAttribute('data-id');
                 
-                // Show authentication popup
+                // Show confirmation popup
                 Swal.fire({
-                    title: 'Authentication Required',
-                    html: `
-                        <div class="mb-3">
-                            <label for="auth_email" class="form-label">Email Address</label>
-                            <input type="email" id="auth_email" class="form-control" placeholder="Enter your email">
-                        </div>
-                        <div class="mb-3">
-                            <label for="auth_password" class="form-label">Password</label>
-                            <input type="password" id="auth_password" class="form-control" placeholder="Enter your password">
-                        </div>
-                    `,
+                    title: 'Mark as Completed',
+                    text: 'Are you sure you want to mark this email as completed?',
+                    icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Authenticate & Complete',
-                    cancelButtonText: 'Cancel',
-                    preConfirm: () => {
-                        const email = document.getElementById('auth_email').value;
-                        const password = document.getElementById('auth_password').value;
-                        
-                        if (!email || !password) {
-                            Swal.showValidationMessage('Please enter both email and password');
-                            return false;
-                        }
-                        
-                        return { email, password };
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        authenticateAndComplete(emailId, result.value.email, result.value.password);
-                    }
-                });
-            });
-        });
-
-        // Delete button functionality
-        document.querySelectorAll('.delete-btn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                const emailId = this.getAttribute('data-id');
-                const subject = this.getAttribute('data-subject');
-                
-                // Show delete confirmation popup
-                Swal.fire({
-                    title: 'Delete Email',
-                    html: `
-                        <p>Are you sure you want to delete this email?</p>
-                        <div class="alert alert-warning">
-                            <strong>Subject:</strong> ${subject}
-                        </div>
-                        <p class="text-danger"><strong>Warning:</strong> This action cannot be undone!</p>
-                    `,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, Delete It!',
+                    confirmButtonText: 'Yes, Complete',
                     cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        deleteEmail(emailId);
+                        completeEmail(emailId);
                     }
                 });
             });
         });
+
     });
 
-    function authenticateAndComplete(emailId, email, password) {
+    function completeEmail(emailId) {
         Swal.fire({
-            title: 'Authenticating...',
+            title: 'Updating Status...',
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
             }
         });
 
-        // First authenticate the user
-        fetch('query/authenticate_user.php', {
+        // Use session-based authentication (no password required)
+        fetch('query/update_status.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: 'email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Authentication successful, now update status to completed
-                return fetch('query/update_status.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'email_id=' + emailId + '&status=completed&admin_email=' + encodeURIComponent(email)
-                });
-            } else {
-                throw new Error(data.message || 'Authentication failed');
-            }
+            body: 'email_id=' + emailId + '&status=completed'
         })
         .then(response => response.json())
         .then(data => {
@@ -203,54 +137,10 @@
         .catch((error) => {
             Swal.fire({
                 icon: 'error',
-                title: 'Authentication Failed',
-                text: error.message || 'Please check your credentials and try again.'
+                title: 'Update Failed',
+                text: 'Please try again.'
             });
         });
     }
 
-    function deleteEmail(emailId) {
-        Swal.fire({
-            title: 'Deleting Email...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        fetch('query/delete_email.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'email_id=' + emailId
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Email Deleted',
-                    text: data.message,
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    location.reload();
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Delete Failed',
-                    text: data.message
-                });
-            }
-        })
-        .catch((error) => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Request Failed',
-                text: 'Failed to delete email. Please try again.'
-            });
-        });
-    }
 </script>

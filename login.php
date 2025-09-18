@@ -22,10 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Replace with password_verify() if hashed
         if ($password === $admin['admin_password']) {
-            $_SESSION['admin_id'] = $admin['admin_id'];
-            $_SESSION['admin_name'] = $admin['admin_name'];
-            $_SESSION['admin_email'] = $admin['admin_email'];
-            $_SESSION['admin_role'] = $admin['admin_role'];
+             $_SESSION['admin_id'] = $admin['admin_id'];
+             $_SESSION['admin_name'] = $admin['admin_name'];
+             $_SESSION['admin_email'] = $admin['admin_email'];
+             $_SESSION['admin_role'] = $admin['admin_role'];
 
             header("Location: index.php");
             exit;

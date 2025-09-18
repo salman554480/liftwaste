@@ -74,73 +74,39 @@ $count_user_pending_task = 0; // Set to 0 to allow unlimited assignments
       btn.addEventListener('click', function() {
         const emailId = this.getAttribute('data-id');
         
-        // Show authentication popup
+        // Show confirmation popup
         Swal.fire({
-          title: 'Authentication Required',
-          html: `
-            <div class="mb-3">
-              <label for="auth_email" class="form-label">Email Address</label>
-              <input type="email" id="auth_email" class="form-control" placeholder="Enter your email">
-            </div>
-            <div class="mb-3">
-              <label for="auth_password" class="form-label">Password</label>
-              <input type="password" id="auth_password" class="form-control" placeholder="Enter your password">
-            </div>
-          `,
+          title: 'Assign Email',
+          text: 'Are you sure you want to assign this email to yourself?',
+          icon: 'question',
           showCancelButton: true,
-          confirmButtonText: 'Authenticate & Assign',
-          cancelButtonText: 'Cancel',
-          preConfirm: () => {
-            const email = document.getElementById('auth_email').value;
-            const password = document.getElementById('auth_password').value;
-            
-            if (!email || !password) {
-              Swal.showValidationMessage('Please enter both email and password');
-              return false;
-            }
-            
-            return { email, password };
-          }
+          confirmButtonText: 'Yes, Assign',
+          cancelButtonText: 'Cancel'
         }).then((result) => {
           if (result.isConfirmed) {
-            authenticateAndAssign(emailId, result.value.email, result.value.password);
+            assignEmail(emailId);
           }
         });
       });
     });
   });
 
-  function authenticateAndAssign(emailId, email, password) {
+  function assignEmail(emailId) {
     Swal.fire({
-      title: 'Authenticating...',
+      title: 'Assigning Email...',
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
       }
     });
 
-    // First authenticate the user
-    fetch('query/authenticate_user.php', {
+    // Use session-based authentication (no password required)
+    fetch('query/update_status.php', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: 'email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password)
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        // Authentication successful, now assign the email
-        return fetch('query/update_status.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: 'email_id=' + emailId + '&status=assigned&admin_email=' + encodeURIComponent(email)
-        });
-      } else {
-        throw new Error(data.message || 'Authentication failed');
-      }
+      body: 'email_id=' + emailId + '&status=assigned'
     })
     .then(response => response.json())
     .then(data => {
@@ -165,8 +131,8 @@ $count_user_pending_task = 0; // Set to 0 to allow unlimited assignments
     .catch((error) => {
       Swal.fire({
         icon: 'error',
-        title: 'Authentication Failed',
-        text: error.message || 'Please check your credentials and try again.'
+        title: 'Assignment Failed',
+        text: 'Please try again.'
       });
     });
   }

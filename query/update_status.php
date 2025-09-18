@@ -3,44 +3,25 @@
 date_default_timezone_set('America/New_York');
 
 require_once('../parts/db.php');
+require_once('../parts/session.php');
 
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email_id = isset($_POST['email_id']) ? intval($_POST['email_id']) : 0;
     $new_status = isset($_POST['status']) ? $_POST['status'] : '';
-    $admin_email = isset($_POST['admin_email']) ? trim($_POST['admin_email']) : '';
 
-    // If admin_email is provided, find the admin_id
-    if (!empty($admin_email)) {
-        $admin_query = "SELECT admin_id FROM admins WHERE admin_email = ?";
-        $stmt = mysqli_prepare($conn, $admin_query);
-        if ($stmt) {
-            mysqli_stmt_bind_param($stmt, "s", $admin_email);
-            mysqli_stmt_execute($stmt);
-            $result = mysqli_stmt_get_result($stmt);
-            if (mysqli_num_rows($result) == 1) {
-                $admin_data = mysqli_fetch_assoc($result);
-                $admin_id = $admin_data['admin_id'];
-            } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Admin user not found'
-                ]);
-                exit();
-            }
-            mysqli_stmt_close($stmt);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Database error'
-            ]);
-            exit();
-        }
-    } else {
-        // Set default admin_id for guest users
-        $admin_id = 1; // Default admin ID for system operations
+    // Check if user is logged in
+    if (!isLoggedIn()) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Authentication required. Please login.'
+        ]);
+        exit();
     }
+
+    // Use session admin_id
+    $admin_id = $_SESSION['admin_id'];
 
     if ($email_id > 0) {
 
