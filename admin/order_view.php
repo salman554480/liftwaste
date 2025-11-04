@@ -65,6 +65,33 @@ $page= "order_view";
 
     <?php require_once('parts/footer.php'); ?>
 
+    <style>
+    .email-content-wrapper {
+        width: 100%;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .email-content-frame {
+        width: 100%;
+        height: 400px;
+        border: none;
+        display: block;
+    }
+
+    .email-content {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .email-content img {
+        max-width: 100%;
+        height: auto;
+    }
+    </style>
+
     <script>
         // Load emails when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -87,6 +114,12 @@ $page= "order_view";
                     document.getElementById('emailRecords').innerHTML = 
                         '<div class="alert alert-danger">Failed to load emails. Please try again.</div>';
                 });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         function displayEmails(emails) {
@@ -173,9 +206,21 @@ $page= "order_view";
                                 <div class="mt-3">
                                     <h6>Email Content</h6>
                                     <div class="border rounded p-3 bg-light">
-                                        <div id="emailContent${email.id}">
-                                            ${email.body_html || email.body_text || 'No content available'}
+                                        ${email.body_html ? `
+                                        <div class="email-content-wrapper">
+                                            <iframe 
+                                                class="email-content-frame"
+                                                data-email-id="${email.id}"
+                                                title="Email Content">
+                                            </iframe>
                                         </div>
+                                        ` : email.body_text ? `
+                                        <div class="email-content">
+                                            <pre class="mb-0">${escapeHtml(email.body_text)}</pre>
+                                        </div>
+                                        ` : `
+                                        <p class="text-muted mb-0">No content available</p>
+                                        `}
                                     </div>
                                 </div>
                             </div>
@@ -185,6 +230,16 @@ $page= "order_view";
             });
             
             container.innerHTML = html;
+            
+            // Populate iframes with email content
+            emails.forEach(email => {
+                if (email.body_html) {
+                    const iframe = container.querySelector(`iframe[data-email-id="${email.id}"]`);
+                    if (iframe) {
+                        iframe.srcdoc = email.body_html;
+                    }
+                }
+            });
             
             // Add event listeners for delete buttons
             document.querySelectorAll('.delete-email-btn').forEach(function(btn) {
