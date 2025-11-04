@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM admins WHERE admin_email = '$email' LIMIT 1";
+    $sql = "SELECT * FROM admins WHERE admin_email = '$email' and admin_role='admin' LIMIT 1";
     $result = mysqli_query($conn, $sql);
 
     if ($result && mysqli_num_rows($result) == 1) {

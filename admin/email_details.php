@@ -158,8 +158,21 @@ if (!$email) {
                                     <label class="form-label fw-bold">Email Content</label>
                                     <div class="border rounded p-3 bg-light">
                                         <?php if (!empty($email['body_html'])): ?>
-                                        <div class="email-content">
-                                            <?php echo $email['body_html']; ?>
+                                        <div class="email-content-wrapper">
+                                            <iframe 
+                                                id="emailContentFrame" 
+                                                class="email-content-frame"
+                                                srcdoc="<?php echo htmlspecialchars($email['body_html'], ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>"
+                                                title="Email Content">
+                                            </iframe>
+                                        </div>
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="toggleEmailContent()">
+                                                <i class="fas fa-expand me-1"></i>View Raw HTML
+                                            </button>
+                                        </div>
+                                        <div id="rawEmailContent" class="mt-2" style="display: none;">
+                                            <pre class="bg-dark text-light p-3 rounded" style="max-height: 400px; overflow: auto;"><code><?php echo htmlspecialchars($email['body_html'], ENT_QUOTES, 'UTF-8'); ?></code></pre>
                                         </div>
                                         <?php elseif (!empty($email['body_text'])): ?>
                                         <div class="email-content">
@@ -424,6 +437,21 @@ if (!$email) {
     .email-content img {
         max-width: 100%;
         height: auto;
+    }
+
+    .email-content-wrapper {
+        width: 100%;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .email-content-frame {
+        width: 100%;
+        height: 500px;
+        border: none;
+        display: block;
     }
     </style>
 
@@ -860,5 +888,23 @@ if (!$email) {
         const displayHours = hours % 12 || 12;
 
         return `${month}/${day}/${year} - ${displayHours}:${minutes} ${ampm}`;
+    }
+
+    function toggleEmailContent() {
+        const rawContent = document.getElementById('rawEmailContent');
+        const frame = document.getElementById('emailContentFrame');
+        const button = document.querySelector('button[onclick="toggleEmailContent()"]');
+        
+        if (rawContent && frame && button) {
+            if (rawContent.style.display === 'none') {
+                rawContent.style.display = 'block';
+                frame.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-compress me-1"></i>View Rendered';
+            } else {
+                rawContent.style.display = 'none';
+                frame.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-expand me-1"></i>View Raw HTML';
+            }
+        }
     }
     </script>
